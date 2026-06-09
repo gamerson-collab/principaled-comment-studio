@@ -202,14 +202,15 @@ async function postReplyToYouTube(token, parentId, replyText) {
   });
 }
 
-async function generateReply(comment) {
+async function generateReply(comment, apiKey) {
   const prompt = `${BRAND_VOICE}\n\nVIDEO: "${comment.videoTitle}"\nCOMMENTER: ${comment.author}\nCOMMENT: "${comment.text}"`;
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
     body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, messages: [{ role: "user", content: prompt }] })
   });
   const data = await response.json();
+  if (data.error) throw new Error(data.error.message);
   const text = data.content?.[0]?.text || "";
   const categoryMatch = text.match(/CATEGORY:\s*(\w+)/);
   const replyMatch = text.match(/REPLY:\s*([\s\S]+)/);
@@ -218,6 +219,8 @@ async function generateReply(comment) {
 
 function App() {
   const [clientIdInput, setClientIdInput] = useState(() => localStorage.getItem("yt_client_id") || "");
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem("anthropic_api_key") || "");
+  const [apiKeyInput, setApiKeyInput] = useState(() => localStorage.getItem("anthropic_api_key") || "");
   const [token, setToken] = useState(null);
   const [tokenExpiry, setTokenExpiry] = useState(null);
   const [channel, setChannel] = useState(null);
@@ -293,7 +296,7 @@ function App() {
     for (const comment of pending) {
       if (abortRef.current) break;
       setLoading(p => ({...p,[comment.id]:"generating"}));
-      try { const result = await generateReply(comment); setGenerated(p => ({...p,[comment.id]:result})); }
+      try { const result = await generateReply(comment, apiKey); setGenerated(p => ({...p,[comment.id]:result})); }
       catch { setGenerated(p => ({...p,[comment.id]:{category:"UNKNOWN",reply:"Error — regenerate."}})); }
       setLoading(p => ({...p,[comment.id]:false}));
     }
@@ -303,7 +306,7 @@ function App() {
 
   const generateOne = async (comment) => {
     setLoading(p => ({...p,[comment.id]:"generating"}));
-    try { const result = await generateReply(comment); setGenerated(p => ({...p,[comment.id]:result})); }
+    try { const result = await generateReply(comment, apiKey); setGenerated(p => ({...p,[comment.id]:result})); }
     catch { setGenerated(p => ({...p,[comment.id]:{category:"UNKNOWN",reply:"Error — try again."}})); }
     setLoading(p => ({...p,[comment.id]:false}));
   };
@@ -348,9 +351,19 @@ function App() {
             <p style={{fontSize:11,color:"#3a3d4a",marginTop:6,lineHeight:1.6}}>
               From <strong style={{color:"#555"}}>console.cloud.google.com</strong> → Credentials → OAuth 2.0 Client ID (Web application).
             </p>
+            <label style={{fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8,marginTop:18,letterSpacing:".5px"}}>ANTHROPIC API KEY</label>
+            <input className="input" type="password" placeholder="sk-ant-..." value={apiKeyInput} onChange={e=>setApiKeyInput(e.target.value)} />
+            <p style={{fontSize:11,color:"#3a3d4a",marginTop:6,lineHeight:1.6}}>
+              From <strong style={{color:"#555"}}>console.anthropic.com</strong> → Get API key. Stored locally in your browser only.
+            </p>
             <button className="btn btn-gold" style={{width:"100%",justifyContent:"center",padding:"12px 0",fontSize:14,marginTop:16}}
-              disabled={!clientIdInput.trim()}
-              onClick={()=>{ localStorage.setItem("yt_client_id",clientIdInput.trim()); window.location.href=buildAuthUrl(clientIdInput.trim()); }}>
+              disabled={!clientIdInput.trim() || !apiKeyInput.trim()}
+              onClick={()=>{ 
+                localStorage.setItem("yt_client_id",clientIdInput.trim()); 
+                localStorage.setItem("anthropic_api_key",apiKeyInput.trim());
+                setApiKey(apiKeyInput.trim());
+                window.location.href=buildAuthUrl(clientIdInput.trim()); 
+              }}>
               Connect YouTube Account →
             </button>
           </div>
