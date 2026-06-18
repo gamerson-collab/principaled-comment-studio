@@ -336,8 +336,32 @@ function App() {
   const queueList   = comments.filter(c => !posted[c.id]);
   const postedList  = comments.filter(c => posted[c.id]);
   const tokenValid  = token && tokenExpiry && Date.now() < tokenExpiry;
+  const savedClientId = localStorage.getItem("yt_client_id");
 
   if (!tokenValid) {
+    // If we have a saved client ID but no valid token, session expired — show a clear message
+    if (savedClientId) {
+      return (
+        <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
+          <div style={{maxWidth:480,width:"100%",textAlign:"center"}}>
+            <div style={{width:54,height:54,background:"linear-gradient(135deg,#C9973A,#daa840)",borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,margin:"0 auto 16px"}}>🎓</div>
+            <h1 style={{fontFamily:"'Playfair Display',serif",fontSize:22,marginBottom:8}}>PrincipalED Comment Studio</h1>
+            <div style={{background:"#1a1020",border:"1px solid #7a3a3a",borderRadius:12,padding:20,margin:"20px 0"}}>
+              <p style={{color:"#f87171",fontWeight:600,fontSize:14,marginBottom:6}}>⚠ Session Expired</p>
+              <p style={{color:"#888",fontSize:13,lineHeight:1.6}}>Your YouTube session has expired (tokens last 1 hour). Click below to reconnect — it only takes a second.</p>
+            </div>
+            <button className="btn btn-gold" style={{width:"100%",justifyContent:"center",padding:"13px 0",fontSize:14}}
+              onClick={()=>window.location.href=buildAuthUrl(savedClientId)}>
+              ↺ Reconnect YouTube →
+            </button>
+            <button className="btn btn-ghost" style={{width:"100%",justifyContent:"center",padding:"10px 0",fontSize:13,marginTop:10}}
+              onClick={()=>{localStorage.removeItem("yt_client_id");localStorage.removeItem("anthropic_api_key");window.location.reload();}}>
+              Start fresh (clear saved credentials)
+            </button>
+          </div>
+        </div>
+      );
+    }
     return (
       <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
         <div style={{maxWidth:520,width:"100%"}}>
