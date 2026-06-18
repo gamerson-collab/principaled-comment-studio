@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PrincipalED Comment Studio</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -347,12 +347,12 @@ function App() {
             <div style={{width:54,height:54,background:"linear-gradient(135deg,#C9973A,#daa840)",borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,margin:"0 auto 16px"}}>🎓</div>
             <h1 style={{fontFamily:"'Playfair Display',serif",fontSize:22,marginBottom:8}}>PrincipalED Comment Studio</h1>
             <div style={{background:"#1a1020",border:"1px solid #7a3a3a",borderRadius:12,padding:20,margin:"20px 0"}}>
-              <p style={{color:"#f87171",fontWeight:600,fontSize:14,marginBottom:6}}>⚠ Session Expired</p>
-              <p style={{color:"#888",fontSize:13,lineHeight:1.6}}>Your YouTube session has expired (tokens last 1 hour). Click below to reconnect — it only takes a second.</p>
+              <p style={{color:"#f87171",fontWeight:600,fontSize:14,marginBottom:6}}>&#9888; Session Expired</p>
+              <p style={{color:"#888",fontSize:13,lineHeight:1.6}}>Your YouTube session has expired (tokens last 1 hour). Click below to reconnect &mdash; it only takes a second.</p>
             </div>
             <button className="btn btn-gold" style={{width:"100%",justifyContent:"center",padding:"13px 0",fontSize:14}}
               onClick={()=>window.location.href=buildAuthUrl(savedClientId)}>
-              ↺ Reconnect YouTube →
+              &#8634; Reconnect YouTube &rarr;
             </button>
             <button className="btn btn-ghost" style={{width:"100%",justifyContent:"center",padding:"10px 0",fontSize:13,marginTop:10}}
               onClick={()=>{localStorage.removeItem("yt_client_id");localStorage.removeItem("anthropic_api_key");window.location.reload();}}>
@@ -374,12 +374,12 @@ function App() {
             <label style={{fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8,letterSpacing:".5px"}}>YOUTUBE OAUTH CLIENT ID</label>
             <input className="input" placeholder="Paste your OAuth 2.0 Client ID" value={clientIdInput} onChange={e=>setClientIdInput(e.target.value)} />
             <p style={{fontSize:11,color:"#3a3d4a",marginTop:6,lineHeight:1.6}}>
-              From <strong style={{color:"#555"}}>console.cloud.google.com</strong> → Credentials → OAuth 2.0 Client ID (Web application).
+              From <strong style={{color:"#555"}}>console.cloud.google.com</strong> &rarr; Credentials &rarr; OAuth 2.0 Client ID (Web application).
             </p>
             <label style={{fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8,marginTop:18,letterSpacing:".5px"}}>ANTHROPIC API KEY</label>
             <input className="input" type="password" placeholder="sk-ant-..." value={apiKeyInput} onChange={e=>setApiKeyInput(e.target.value)} />
             <p style={{fontSize:11,color:"#3a3d4a",marginTop:6,lineHeight:1.6}}>
-              From <strong style={{color:"#555"}}>console.anthropic.com</strong> → Get API key. Stored locally in your browser only.
+              From <strong style={{color:"#555"}}>console.anthropic.com</strong> &rarr; Get API key. Stored locally in your browser only.
             </p>
             <button className="btn btn-gold" style={{width:"100%",justifyContent:"center",padding:"12px 0",fontSize:14,marginTop:16}}
               disabled={!clientIdInput.trim() || !apiKeyInput.trim()}
@@ -389,13 +389,13 @@ function App() {
                 setApiKey(apiKeyInput.trim());
                 window.location.href=buildAuthUrl(clientIdInput.trim()); 
               }}>
-              Connect YouTube Account →
+              Connect YouTube Account &rarr;
             </button>
           </div>
           {localStorage.getItem("yt_client_id") && (
             <div style={{marginTop:14,textAlign:"center"}}>
               <button className="btn btn-ghost" style={{fontSize:12}} onClick={()=>window.location.href=buildAuthUrl(localStorage.getItem("yt_client_id"))}>
-                ↺ Reconnect with saved Client ID
+                &#8634; Reconnect with saved Client ID
               </button>
             </div>
           )}
@@ -491,7 +491,7 @@ function App() {
           </div>
         )}
 
-        {fetchError && <div style={{background:"#1a0808",border:"1px solid #7a2020",borderRadius:10,padding:"12px 16px",marginBottom:14,fontSize:13,color:"#f87171"}}>⚠ {fetchError}</div>}
+        {fetchError && <div style={{background:"#1a0808",border:"1px solid #7a2020",borderRadius:10,padding:"12px 16px",marginBottom:14,fontSize:13,color:"#f87171"}}>&#9888; {fetchError}</div>}
 
         {activeTab==="queue" && !scanning && queueList.length===0 && (
           <div style={{textAlign:"center",padding:"60px 0",color:"#333"}}>
@@ -544,7 +544,7 @@ function App() {
                           <>
                             <button className="btn btn-green" onClick={()=>{setApproved(p=>({...p,[comment.id]:true}));showToast("Approved ✓");}}>✓ Approve</button>
                             <button className="btn btn-ghost" onClick={()=>{setEditingId(comment.id);setEditText(gen.reply);}}>✎ Edit</button>
-                            <button className="btn btn-ghost" onClick={()=>generateOne(comment)}>↺ Regen</button>
+                            <button className="btn btn-ghost" onClick={()=>generateOne(comment)}>&#8634; Regen</button>
                           </>
                         ) : (
                           <>
